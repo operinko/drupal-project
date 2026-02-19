@@ -14,8 +14,11 @@ hooks:
         fi
         # Run once start hook if needed
         if [ ! -f "/mnt/wdr-hooks/ddev_web_post_start_once" ]; then
+          mkdir -p /mnt/wdr-hooks
           /usr/local/bin/wdr-core hooks web-post-start-once.sh;
-          sudo touch /mnt/wdr-hooks/ddev_web_post_start_once
+          touch /mnt/wdr-hooks/ddev_web_post_start_once
+        else
+          :
         fi
     # Script to run on every start on the host.
     - exec-host: '${DDEV_GLOBAL_DIR}/wunderio/core/wdr-core.sh hooks host-post-start.sh'

@@ -112,10 +112,10 @@ For a complete list of all available services, URLs, and ports, use:
 
 - `ddev` - Display available commands
 - `ddev adminer` - Launch Adminer database management interface
-- `ddev grumphp <commands>` - Run code quality checks
+- `ddev grumphp <commands>` - Run code quality checks (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 - `ddev mailpit` - Open Mailpit email testing interface
 - `ddev npm <commands>` - Execute npm commands
-- `ddev phpunit <commands>` - Run test suites
+- `ddev phpunit <commands>` - Run test suites (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 - `ddev varnishadm <commands>` - Manage Varnish cache
 - `ddev xdebug <mode>` - Configure Xdebug debugging modes
 - `ddev syncdb [environment]` - Sync database from remote environment (requires VPN and `ddev auth ssh`, the command is provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
@@ -178,6 +178,12 @@ hooks:
 ```
 
 This means developers only need to clone the project and run `ddev start`; no manual addon installation step is required.
+
+Common commands provided by the addon include:
+
+- `ddev grumphp`
+- `ddev phpunit`
+- `ddev syncdb`
 
 </details>
 
