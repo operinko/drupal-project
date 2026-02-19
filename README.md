@@ -155,6 +155,18 @@ Elasticvue is included for visualization and management at <http://drupal-projec
 
 </details>
 
+<details>
+<summary>DDEV WunderIO Drupal</summary>
+
+#### DDEV WunderIO Drupal addon
+
+The Drupal template includes the Mearra/Wunder-specific `ddev-wunderio-drupal` addon. This addon provides additional functionality and tools specifically designed for Drupal development, including custom commands, configurations, and automation scripts to enhance your workflow.
+
+For more information about the addon, configuration options, and available custom commands, see:
+<https://github.com/wunderio/ddev-wunderio-drupal/tree/main>
+
+</details>
+
 ## Development tips
 
 <details>
