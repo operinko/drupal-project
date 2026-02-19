@@ -165,6 +165,20 @@ The Drupal template includes the Mearra/Wunder-specific `ddev-wunderio-drupal` a
 For more information about the addon, configuration options, and available custom commands, see:
 <https://github.com/wunderio/ddev-wunderio-drupal/tree/main>
 
+#### Automated installation
+
+This addon is installed automatically when you run `ddev start`.
+
+The automation is configured in `.ddev/config.wunderio.yaml` using a `pre-start` host hook:
+
+```yaml
+hooks:
+   pre-start:
+      - exec-host: 'if [ ! -d "${DDEV_GLOBAL_DIR}/wunderio/core" ]; then ddev add-on get wunderio/ddev-wunderio-drupal; fi'
+```
+
+This means developers only need to clone the project and run `ddev start`; no manual addon installation step is required.
+
 </details>
 
 ## Development tips
