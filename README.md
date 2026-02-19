@@ -118,7 +118,7 @@ For a complete list of all available services, URLs, and ports, use:
 - `ddev phpunit <commands>` - Run test suites (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 - `ddev varnishadm <commands>` - Manage Varnish cache
 - `ddev xdebug <mode>` - Configure Xdebug debugging modes
-- `ddev syncdb [environment]` - Sync database from remote environment (requires VPN and `ddev auth ssh`, the command is provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
+- `ddev syncdb [environment]` - Sync database from remote environment (requires VPN and `ddev auth ssh` (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 
 <details>
 <summary>DDEV Elasticsearch configuration</summary>
@@ -160,7 +160,7 @@ Elasticvue is included for visualization and management at <http://drupal-projec
 
 #### DDEV WunderIO Drupal addon
 
-The Drupal template includes the Mearra/Wunder-specific `ddev-wunderio-drupal` addon. This addon provides additional functionality and tools specifically designed for Drupal development, including custom commands, configurations, and automation scripts to enhance your workflow.
+The Drupal template includes the Wunder-specific `ddev-wunderio-drupal` addon. This addon provides additional functionality and tools specifically designed for Drupal development, including custom commands, configurations, and automation scripts to enhance your workflow.
 
 For more information about the addon, configuration options, and available custom commands, see:
 <https://github.com/wunderio/ddev-wunderio-drupal/tree/main>
