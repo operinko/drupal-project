@@ -8,8 +8,8 @@ services:
       - ~/.ddev/wunderio:/mnt/ddev-global-cache/wunderio
       - hooks:/mnt/wdr-hooks
 
-# In DDEV all the places which are kept during start and stop are kept in
-# mounted volumes so able to determine is there certain hooks been called we
-# need to set something permanent.
+# In DDEV, data that must persist across container restarts is stored in
+# named volumes. The "hooks" volume persists a marker file so that
+# one-time ("run-once") hooks are not executed again on subsequent starts.
 volumes:
   hooks:
