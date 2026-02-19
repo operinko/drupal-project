@@ -9,8 +9,8 @@ hooks:
     # Build hook workaround to run composer install on first start.
     # @todo We could potentially make this work from recognizing the command.
     - exec: |
-        if ! command -v wdr-core &> /dev/null; then
-          ln -s /mnt/ddev-global-cache/wunderio/core/wdr-core.sh /usr/local/bin/wdr-core
+        if ! command -v wdr-core >/dev/null 2>&1; then
+          ln -sf /mnt/ddev-global-cache/wunderio/core/wdr-core.sh /usr/local/bin/wdr-core
         fi
         # Run once start hook if needed
         if [ ! -f "/mnt/wdr-hooks/ddev_web_post_start_once" ]; then
