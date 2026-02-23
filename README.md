@@ -112,13 +112,13 @@ For a complete list of all available services, URLs, and ports, use:
 
 - `ddev` - Display available commands
 - `ddev adminer` - Launch Adminer database management interface
-- `ddev grumphp <commands>` - Run code quality checks
+- `ddev grumphp <commands>` - Run code quality checks (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 - `ddev mailpit` - Open Mailpit email testing interface
 - `ddev npm <commands>` - Execute npm commands
-- `ddev phpunit <commands>` - Run test suites
+- `ddev phpunit <commands>` - Run test suites (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 - `ddev varnishadm <commands>` - Manage Varnish cache
 - `ddev xdebug <mode>` - Configure Xdebug debugging modes
-- `ddev syncdb [environment]` - Sync database from remote environment (requires VPN and `ddev auth ssh`, the command is provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
+- `ddev syncdb [environment]` - Sync database from remote environment (requires VPN and `ddev auth ssh` (command provided by [ddev-wunderio-drupal](https://github.com/wunderio/ddev-wunderio-drupal))
 
 <details>
 <summary>DDEV Elasticsearch configuration</summary>
@@ -152,6 +152,38 @@ ddev exec -s elasticsearch "bin/elasticsearch-plugin list"
 ##### Web interface
 
 Elasticvue is included for visualization and management at <http://drupal-project.ddev.site:9005>
+
+</details>
+
+<details>
+<summary>DDEV WunderIO Drupal</summary>
+
+#### DDEV WunderIO Drupal addon
+
+The Drupal template includes the Wunder-specific `ddev-wunderio-drupal` addon. This addon provides additional functionality and tools specifically designed for Drupal development, including custom commands, configurations, and automation scripts to enhance your workflow.
+
+For more information about the addon, configuration options, and available custom commands, see:
+<https://github.com/wunderio/ddev-wunderio-drupal/tree/main>
+
+#### Automated installation
+
+This addon is installed automatically when you run `ddev start`.
+
+The automation is configured in `.ddev/config.wunderio.yaml` using a `pre-start` host hook:
+
+```yaml
+hooks:
+  pre-start:
+    - exec-host: 'if [ ! -f "${DDEV_GLOBAL_DIR}/wunderio/core/wdr-core.sh" ]; then ddev add-on get wunderio/ddev-wunderio-drupal; fi'
+```
+
+This means developers only need to clone the project and run `ddev start`; no manual addon installation step is required.
+
+Common commands provided by the addon include:
+
+- `ddev grumphp`
+- `ddev phpunit`
+- `ddev syncdb`
 
 </details>
 
