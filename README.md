@@ -174,7 +174,7 @@ The automation is configured in `.ddev/config.wunderio.yaml` using a `pre-start`
 ```yaml
 hooks:
   pre-start:
-    - exec-host: 'if [ ! -d "${DDEV_GLOBAL_DIR}/wunderio/core" ]; then ddev add-on get wunderio/ddev-wunderio-drupal; fi'
+    - exec-host: 'if [ ! -f "${DDEV_GLOBAL_DIR}/wunderio/core/wdr-core.sh" ]; then ddev add-on get wunderio/ddev-wunderio-drupal; fi'
 ```
 
 This means developers only need to clone the project and run `ddev start`; no manual addon installation step is required.
