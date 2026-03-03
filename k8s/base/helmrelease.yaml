@@ -7,8 +7,9 @@
 #
 #   NAMESPACE     — client namespace (e.g. client-fi-turku)
 #   BRANCH_PREFIX — branch/environment prefix (e.g. staging, develop, pr-123)
-#   ENVIRONMENT   — logical environment name (staging, develop, or pr-<n>)
-#   DOMAIN        — full hostname (e.g. staging.turku.dev.wdr.io)
+#   PROJECT_NAME  — project name for domain construction (equals NAMESPACE)
+#   DOMAIN        — full hostname (e.g. staging.client-fi-turku.dev.wdr.io)
+#   REGISTRY      — container registry (registry.wdr.io)
 #
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -22,7 +23,7 @@ spec:
     spec:
       chart: drupal
       # Pinned minor version — bump via Renovate or manually.
-      version: ">=4.0.0 <5.0.0"
+      version: ">=1.0.0 <2.0.0"
       sourceRef:
         kind: HelmRepository
         name: wunder-charts
@@ -41,38 +42,20 @@ spec:
   values:
     # Environment identity — injected by Flux postBuild.substitute
     environmentName: ${BRANCH_PREFIX}
-    namespace: ${NAMESPACE}
+    projectName: ${PROJECT_NAME}
 
-    # Ingress
-    ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: traefik
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-      hosts:
-        - host: ${DOMAIN}
-          paths:
-            - path: /
-              pathType: Prefix
-      tls:
-        - hosts:
-            - ${DOMAIN}
-          secretName: ${NAMESPACE}-${BRANCH_PREFIX}-tls
+    # Cluster type — prevents GKE-specific resources (BackendConfig) from being rendered.
+    cluster:
+      type: upcloud
 
     # Image tags — managed by Flux Image Automation Controller.
     # These markers are updated in-place by the ImageUpdateAutomation resource.
     # Do NOT edit the tags manually — they will be overwritten by Flux.
     php:
-      image:
-        repository: ${REGISTRY}/${NAMESPACE}/php
-        tag: main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-php-${BRANCH_PREFIX}:tag"}
+      image: ${REGISTRY}/${NAMESPACE}/php:main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-php-${BRANCH_PREFIX}"}
 
     nginx:
-      image:
-        repository: ${REGISTRY}/${NAMESPACE}/nginx
-        tag: main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-nginx-${BRANCH_PREFIX}:tag"}
+      image: ${REGISTRY}/${NAMESPACE}/nginx:main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-nginx-${BRANCH_PREFIX}"}
 
     shell:
-      image:
-        repository: ${REGISTRY}/${NAMESPACE}/shell
-        tag: main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-shell-${BRANCH_PREFIX}:tag"}
+      image: ${REGISTRY}/${NAMESPACE}/shell:main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-shell-${BRANCH_PREFIX}"}
