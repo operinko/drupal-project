@@ -12,10 +12,10 @@ configMapGenerator:
   # Layer silta.yml first, then silta-prod.yml on top.
   - name: drupal-silta-values
     files:
-      - values=../../silta/silta.yml
+      - values=../../../silta/silta.yml
   - name: drupal-silta-prod-values
     files:
-      - values=../../silta/silta-prod.yml
+      - values=../../../silta/silta-prod.yml
 
 patches:
   - patch: |
