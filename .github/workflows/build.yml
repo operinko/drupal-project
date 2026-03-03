@@ -48,7 +48,10 @@ jobs:
           BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}"
           # Normalise branch name: slashes → dashes, truncate to 40 chars
           SAFE=$(echo "$BRANCH" | tr '/' '-' | tr '_' '-' | cut -c1-40)
-          echo "tag=${SAFE}-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          # Include UTC timestamp so alphabetical order = chronological order
+          # Format: <branch>-<YYYYMMDDTHHmmSS>-<sha>  e.g. main-20260303T213500-6dd52a2
+          TIMESTAMP=$(date -u +%Y%m%dT%H%M%S)
+          echo "tag=${SAFE}-${TIMESTAMP}-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
           echo "branch=${SAFE}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
