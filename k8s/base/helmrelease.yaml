@@ -34,7 +34,6 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: base-drupal-values
-      namespace: flux-system
       optional: true # Allows local development without the ConfigMap
 
   # Project-specific overrides (contents of silta/silta.yml).
