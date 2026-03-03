@@ -23,9 +23,10 @@ mailpit:
   enabled: true
 
 # MariaDB configuration.
+# NOTE: chart uses mariadb 7.x (Bitnami), key is 'master' not 'primary'.
 mariadb:
   enabled: true
-  primary:
+  master:
     persistence:
       size: 1Gi
     resources:
@@ -35,17 +36,17 @@ mariadb:
       limits:
         memory: 488Mi
 
-# File storage via NFS/Filestore — storageClassName depends on the cluster CSI driver.
-# On UpCloud (Longhorn or NFS provisioner): set to the appropriate class.
-# Platform team will confirm the correct storageClassName for your cluster.
+# File mounts — UpCloud block storage requires ReadWriteOnce.
 mounts:
   public-files:
     enabled: true
     storage: 10Gi
     mountPath: /app/web/sites/default/files
     storageClassName: upcloud-block-storage-maxiops
+    accessMode: ReadWriteOnce
   private-files:
     enabled: true
     storage: 1Gi
     mountPath: /app/private
     storageClassName: upcloud-block-storage-maxiops
+    accessMode: ReadWriteOnce
