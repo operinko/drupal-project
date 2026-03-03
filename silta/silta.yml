@@ -50,3 +50,9 @@ mounts:
     mountPath: /app/private
     storageClassName: upcloud-block-storage-maxiops
     accessMode: ReadWriteOnce
+
+# Shell sidecar SSH host key storage — UpCloud block storage, RWO.
+shell:
+  mount:
+    storageClassName: upcloud-block-storage-maxiops
+    accessMode: ReadWriteOnce
