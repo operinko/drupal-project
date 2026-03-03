@@ -1,0 +1,36 @@
+---
+# Production overlay — used for the production environment only.
+# Consumed by the cluster-management Kustomization pointing at this path
+# for the production branch.
+#
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+configMapGenerator:
+  # Layer silta.yml first, then silta-prod.yml on top.
+  - name: drupal-silta-values
+    files:
+      - values=../../silta/silta.yml
+  - name: drupal-silta-prod-values
+    files:
+      - values=../../silta/silta-prod.yml
+
+patches:
+  - patch: |
+      - op: add
+        path: /spec/valuesFrom/-
+        value:
+          kind: ConfigMap
+          name: drupal-silta-values
+          valuesKey: values
+      - op: add
+        path: /spec/valuesFrom/-
+        value:
+          kind: ConfigMap
+          name: drupal-silta-prod-values
+          valuesKey: values
+    target:
+      kind: HelmRelease
+      name: drupal

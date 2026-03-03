@@ -1,0 +1,32 @@
+---
+# Dev overlay — used for staging, develop, and PR environments.
+# Consumed by the cluster-management ResourceSet Kustomization pointing at:
+#   path: ./k8s/overlays/dev
+#
+# The REGISTRY variable is injected by Flux postBuild.substitute from
+# the cluster-management Kustomization. Set it to your Harbor registry hostname.
+#
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+# Merge silta.yml Helm values on top of the cluster-management base defaults.
+# The configMapGenerator creates a ConfigMap from silta/silta.yml that the
+# HelmRelease picks up via valuesFrom.
+configMapGenerator:
+  - name: drupal-silta-values
+    files:
+      - values=../../silta/silta.yml
+
+patches:
+  - patch: |
+      - op: add
+        path: /spec/valuesFrom/-
+        value:
+          kind: ConfigMap
+          name: drupal-silta-values
+          valuesKey: values
+    target:
+      kind: HelmRelease
+      name: drupal

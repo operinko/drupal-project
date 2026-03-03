@@ -1,6 +1,7 @@
-# Production environment configuration.
+# Production environment overrides.
 #
-# Override the default values of Wunder's Drupal Helm chart and silta.yml.
+# These values are merged on top of silta.yml (which itself is merged on top of
+# the cluster-management base defaults) for the production environment only.
 # @see: https://github.com/wunderio/charts/blob/master/drupal/values.yaml
 
 # Enable autoscaling.
@@ -9,9 +10,8 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 5
 
-# Reference data configuration.
+# Reference data: don't delay production deployments with ref data syncs.
 referenceData:
-  # Don't delay the production deployment process with reference data updates.
   updateAfterDeployment: false
 
 # Enable backups.
@@ -27,16 +27,14 @@ php:
   resources:
     requests:
       cpu: 200m
-      memory: 256M
+      memory: 256Mi
     limits:
       cpu: 500m
-      memory: 512M
-  # Set the preproduction environment URI.
-  # Update this to match the production URI during the site launch.
+      memory: 512Mi
   env:
-    DRUSH_OPTIONS_URI: "https://production.drupal-project.finland.wdr.io"
-
-  # Don't show errors in production.
+    # Update this to match the production domain after site launch.
+    # Uses the DOMAIN variable injected by Flux postBuild.substitute.
+    DRUSH_OPTIONS_URI: "https://${DOMAIN}"
   errorLevel: "hide"
 
 # Nginx configuration.
@@ -44,7 +42,7 @@ nginx:
   resources:
     requests:
       cpu: 50m
-      memory: 50M
+      memory: 50Mi
     limits:
       cpu: 100m
       memory: 150M
@@ -79,12 +77,10 @@ nginx:
 mailpit:
   enabled: false
 
-# MariaDB configuration.
+# MariaDB — larger storage and resources for production.
 mariadb:
-  master:
+  primary:
     persistence:
-      # Database storage disk space allocation.
-      # Request assistance from Ops team to change this on an existing deployment.
       size: 5Gi
     resources:
       requests:
@@ -93,69 +89,3 @@ mariadb:
       limits:
         cpu: 1000m
         memory: 750Mi
-    config: |-
-      [mysqld]
-      skip-name-resolve
-      explicit_defaults_for_timestamp
-      basedir=/opt/bitnami/mariadb
-      plugin_dir=/opt/bitnami/mariadb/plugin
-      port=3306
-      socket=/opt/bitnami/mariadb/tmp/mysql.sock
-      tmpdir=/opt/bitnami/mariadb/tmp
-      max_allowed_packet=256M
-      bind-address=0.0.0.0
-      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
-      log-error=/opt/bitnami/mariadb/logs/mysqld.log
-      character-set-server=UTF8
-      collation-server=utf8_unicode_ci
-      transaction-isolation=READ-COMMITTED
-      # Default max_connections value is 150.
-      # Each active connection consumes approx. 19-20MB of memory.
-      # Consider adding additional memory for production requests/limits when scaling up.
-      max_connections=200
-      # Set innodb_buffer_pool_size to 70/80% of resources.requests.memory (500Mi).
-      innodb_buffer_pool_size=375Mi
-      innodb_log_buffer_size=8M
-      # Set innodb_log_file_size to 12.5% of innodb_buffer_pool_size (47Mi is 12.5% of 375Mi).
-      innodb_log_file_size=47Mi
-      innodb_lock_wait_timeout=120
-      innodb_open_files=49152
-      innodb_flush_log_at_trx_commit=2
-      innodb_flush_method=O_DIRECT
-      table_open_cache=4000
-      table_definition_cache=1000
-      back_log=2048
-      tmp_table_size=64M
-      max_heap_table_size=32M
-      join_buffer_size=2M
-      # have_query_cache=NO
-      performance_schema=1
-      innodb_write_io_threads=16
-      innodb_use_native_aio=0
-      [client]
-      port=3306
-      socket=/opt/bitnami/mariadb/tmp/mysql.sock
-      default-character-set=UTF8
-      plugin_dir=/opt/bitnami/mariadb/plugin
-      [manager]
-      port=3306
-      socket=/opt/bitnami/mariadb/tmp/mysql.sock
-      pid-file=/opt/bitnami/mariadb/tmp/mysqld.pid
-
-# Memcached service configuration.
-# memcached:
-#   enabled: true
-
-# Varnish service configuration.
-varnish:
-  enabled: true
-  resources:
-    requests:
-      cpu: 50m
-      memory: 512Mi
-    limits:
-      cpu: 500m
-      memory: 1Gi
-  # Set the storage backend to file.
-  # @see: https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
-  storageBackend: "file,/var/lib/varnish/varnish_storage.bin,512M"

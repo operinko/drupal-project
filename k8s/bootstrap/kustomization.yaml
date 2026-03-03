@@ -1,0 +1,11 @@
+---
+# This file is the Flux auto-discovery gate.
+# The cluster-management ResourceSetInputProvider uses fileMatch: "k8s/bootstrap/kustomization.yaml"
+# to determine whether a repository opts in to Flux management.
+#
+# Only commit this file when the repository is ready to be deployed.
+# To pause deployments, rename or delete this file — Flux will prune the environment automatically.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../base

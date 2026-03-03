@@ -1,0 +1,8 @@
+# Dockerfile for the Shell/CLI container (drush, cron jobs).
+# ARG BASE_IMAGE allows CI to override the base image version via --build-arg.
+ARG BASE_IMAGE=wunderio/silta-php-shell:php8.3-v1
+FROM $BASE_IMAGE
+
+COPY --chown=www-data:www-data . /app
+
+USER www-data

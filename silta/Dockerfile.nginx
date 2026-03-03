@@ -1,0 +1,6 @@
+# Dockerfile for the Nginx container.
+# ARG BASE_IMAGE allows CI to override the base image version via --build-arg.
+ARG BASE_IMAGE=wunderio/silta-nginx:1.28-v1
+FROM $BASE_IMAGE
+
+COPY web/ /app/web

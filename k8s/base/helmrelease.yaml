@@ -1,0 +1,79 @@
+---
+# Base HelmRelease for the Drupal application.
+#
+# This file is reconciled by Flux from the cluster-management ResourceSet.
+# The following variables are injected at deploy time via postBuild.substitute
+# in the cluster-management Kustomization:
+#
+#   NAMESPACE     — client namespace (e.g. client-fi-turku)
+#   BRANCH_PREFIX — branch/environment prefix (e.g. staging, develop, pr-123)
+#   ENVIRONMENT   — logical environment name (staging, develop, or pr-<n>)
+#   DOMAIN        — full hostname (e.g. staging.turku.dev.wdr.io)
+#
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: drupal
+  namespace: ${NAMESPACE}
+spec:
+  interval: 5m
+  dependsOn: []
+  chart:
+    spec:
+      chart: drupal
+      # Pinned minor version — bump via Renovate or manually.
+      version: ">=4.0.0 <5.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: wunder-charts
+        namespace: flux-system
+      interval: 12h
+
+  # Base values from cluster-management (sensible defaults for all projects).
+  # Provided as a ConfigMap in flux-system by the cluster-management repo.
+  valuesFrom:
+    - kind: ConfigMap
+      name: base-drupal-values
+      namespace: flux-system
+      optional: true # Allows local development without the ConfigMap
+
+  # Project-specific overrides (contents of silta/silta.yml).
+  # These are merged on top of the base ConfigMap values above.
+  values:
+    # Environment identity — injected by Flux postBuild.substitute
+    environmentName: ${BRANCH_PREFIX}
+    namespace: ${NAMESPACE}
+
+    # Ingress
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: traefik
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      hosts:
+        - host: ${DOMAIN}
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - hosts:
+            - ${DOMAIN}
+          secretName: ${NAMESPACE}-${BRANCH_PREFIX}-tls
+
+    # Image tags — managed by Flux Image Automation Controller.
+    # These markers are updated in-place by the ImageUpdateAutomation resource.
+    # Do NOT edit the tags manually — they will be overwritten by Flux.
+    php:
+      image:
+        repository: ${REGISTRY}/${NAMESPACE}/php
+        tag: main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-php-${BRANCH_PREFIX}:tag"}
+
+    nginx:
+      image:
+        repository: ${REGISTRY}/${NAMESPACE}/nginx
+        tag: main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-nginx-${BRANCH_PREFIX}:tag"}
+
+    shell:
+      image:
+        repository: ${REGISTRY}/${NAMESPACE}/shell
+        tag: main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-shell-${BRANCH_PREFIX}:tag"}
