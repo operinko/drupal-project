@@ -56,3 +56,4 @@ shell:
   mount:
     storageClassName: upcloud-block-storage-maxiops
     accessMode: ReadWriteOnce
+    storage: 1Gi
