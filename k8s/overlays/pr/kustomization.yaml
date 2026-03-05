@@ -32,3 +32,10 @@ patches:
     target:
       kind: HelmRelease
       name: drupal
+  # Image tags for PR environments — overwritten by Flux ImageUpdateAutomation.
+  # Image markers live in a separate file (images.yaml) so the setter strategy
+  # can find them on regular YAML lines (not inside block scalars).
+  - path: images.yaml
+    target:
+      kind: HelmRelease
+      name: drupal
