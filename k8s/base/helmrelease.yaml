@@ -23,7 +23,7 @@ spec:
     spec:
       chart: drupal
       # Pinned minor version — bump via Renovate or manually.
-      version: ">=1.0.0 <2.0.0"
+      version: '>=1.0.0 <2.0.0'
       sourceRef:
         kind: HelmRepository
         name: wunder-charts
@@ -37,7 +37,7 @@ spec:
       name: base-drupal-values
       optional: true # Allows local development without the ConfigMap
 
-  # Project-specific overrides (contents of silta/silta.yml).
+  # Project-specific overrides (silta/silta.yml content + environment identity + image tags).
   # These are merged on top of the base ConfigMap values above.
   values:
     # Environment identity — injected by Flux postBuild.substitute
@@ -48,14 +48,63 @@ spec:
     cluster:
       type: upcloud
 
-    # Image tags — managed by Flux Image Automation Controller.
-    # These markers are updated in-place by the ImageUpdateAutomation resource.
-    # Do NOT edit the tags manually — they will be overwritten by Flux.
+    # ---- silta/silta.yml ----
     php:
+      drupalCoreVersion: '11'
+      cron:
+        drupal:
+          schedule: '~ 0 31 2 *'
+      # Image tags — managed by Flux Image Automation Controller.
+      # These markers are updated in-place by the ImageUpdateAutomation resource.
+      # Do NOT edit the tags manually — they will be overwritten by Flux.
       image: ${REGISTRY}/${NAMESPACE}/php:main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-php-${BRANCH_PREFIX}"}
 
     nginx:
       image: ${REGISTRY}/${NAMESPACE}/nginx:main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-nginx-${BRANCH_PREFIX}"}
 
     shell:
+      mount:
+        storageClassName: upcloud-block-storage-maxiops
+        accessMode: ReadWriteOnce
+        storage: 1Gi
       image: ${REGISTRY}/${NAMESPACE}/shell:main-0000000 # {"$imagepolicy": "flux-system:${NAMESPACE}-shell-${BRANCH_PREFIX}"}
+
+    referenceData:
+      enabled: false
+
+    mailpit:
+      enabled: true
+
+    mariadb:
+      enabled: true
+      db:
+        # Pinned password prevents credential drift: Bitnami chart regenerates
+        # random passwords on every helm upgrade if left empty, which breaks
+        # pods after the first install (DB keeps original password, secret changes).
+        password: 'drupal-dev-db-pass'
+      rootUser:
+        password: 'drupal-dev-root-pass'
+      master:
+        persistence:
+          size: 1Gi
+        resources:
+          requests:
+            cpu: 25m
+            memory: 366Mi
+          limits:
+            memory: 488Mi
+
+    mounts:
+      public-files:
+        enabled: true
+        storage: 10Gi
+        mountPath: /app/web/sites/default/files
+        storageClassName: upcloud-block-storage-maxiops
+        accessMode: ReadWriteOnce
+      private-files:
+        enabled: true
+        storage: 1Gi
+        mountPath: /app/private
+        storageClassName: upcloud-block-storage-maxiops
+        accessMode: ReadWriteOnce
+    # ---- end silta/silta.yml ----
