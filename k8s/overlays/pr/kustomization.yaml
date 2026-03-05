@@ -1,0 +1,34 @@
+---
+# PR overlay — used for ephemeral pull-request preview environments.
+# Consumed by the cluster-management ResourceSet Kustomization pointing at:
+#   path: ./k8s/overlays/pr
+#
+# The ResourceSet patches the HelmRelease name to drupal-pr-<n> and injects
+# the per-PR silta values ConfigMap at valuesFrom index 1.
+#
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+
+# Generate a per-PR ConfigMap from silta/silta.yml.
+# The ResourceSet patches its name to drupal-silta-values-pr-<n>.
+generatorOptions:
+  disableNameSuffixHash: true
+
+configMapGenerator:
+  - name: drupal-silta-values
+    files:
+      - values=../../../silta/silta.yml
+
+patches:
+  - patch: |
+      - op: add
+        path: /spec/valuesFrom/-
+        value:
+          kind: ConfigMap
+          name: drupal-silta-values
+          valuesKey: values
+    target:
+      kind: HelmRelease
+      name: drupal

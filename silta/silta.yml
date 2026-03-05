@@ -7,16 +7,16 @@
 # Use silta-prod.yml for production-specific overrides.
 
 php:
-  drupalCoreVersion: "11"
+  drupalCoreVersion: '11'
   cron:
     drupal:
       # Disable cron in feature/PR environments.
       # The ~ is replaced by a random digit (0-9) to spread cron starts.
       schedule: '~ 0 31 2 *'
 
-  # Reference data: sync from the main/staging environment to new environments.
+# Reference data disabled until a stable main/staging environment exists.
 referenceData:
-  referenceEnvironment: 'main'
+  enabled: false
 
 # Enable Mailpit (mail catcher) in non-production environments.
 mailpit:
@@ -24,8 +24,20 @@ mailpit:
 
 # MariaDB configuration.
 # NOTE: chart uses mariadb 7.x (Bitnami), key is 'master' not 'primary'.
+#
+# IMPORTANT: db.password and rootUser.password are set explicitly here to prevent
+# credential drift. The Bitnami MariaDB chart regenerates passwords on every
+# helm upgrade when they are empty (randAlphaNum), causing "Access denied" errors
+# because the Secret is updated but the already-initialised PVC keeps the original
+# password. Setting explicit passwords here makes every upgrade idempotent.
+# These are non-production dev/PR credentials — production should override via
+# silta-prod.yml with SOPS-encrypted secrets.
 mariadb:
   enabled: true
+  db:
+    password: 'drupal-dev-db-pass'
+  rootUser:
+    password: 'drupal-dev-root-pass'
   master:
     persistence:
       size: 1Gi
