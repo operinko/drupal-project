@@ -2,7 +2,10 @@ name: Build & Push Images
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
+      - develop
+      - production
     paths-ignore:
       - "k8s/**"
       - "**.md"
@@ -39,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set image tag
         id: tag

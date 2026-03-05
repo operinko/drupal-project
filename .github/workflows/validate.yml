@@ -2,7 +2,10 @@ name: Validate
 
 on:
   push:
-    branches: ["**"]
+    branches:
+      - main
+      - develop
+      - production
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -19,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress
