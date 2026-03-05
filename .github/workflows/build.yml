@@ -67,6 +67,27 @@ jobs:
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
+      - name: Ensure Harbor project exists
+        shell: bash
+        run: |
+          # Create the Harbor project if it doesn't already exist (idempotent).
+          # Uses the same robot credentials as the docker login above.
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -u "${{ secrets.REGISTRY_USERNAME }}:${{ secrets.REGISTRY_PASSWORD }}" \
+            "https://${REGISTRY}/api/v2.0/projects?name=${REPO}")
+          if [ "$STATUS" = "200" ]; then
+            echo "Project '${REPO}' already exists."
+          else
+            echo "Creating project '${REPO}'..."
+            curl -s -f -X POST \
+              -u "${{ secrets.REGISTRY_USERNAME }}:${{ secrets.REGISTRY_PASSWORD }}" \
+              -H "Content-Type: application/json" \
+              "https://${REGISTRY}/api/v2.0/projects" \
+              -d "{\"project_name\":\"${REPO}\",\"public\":false}" \
+              && echo "Project created." \
+              || echo "::warning::Failed to create project (may already exist or lack permissions)."
+          fi
+
       - name: Build & push image
         uses: docker/build-push-action@v6
         with:
