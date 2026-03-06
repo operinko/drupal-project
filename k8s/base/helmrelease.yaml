@@ -19,6 +19,16 @@ metadata:
 spec:
   interval: 5m
   dependsOn: []
+  # Don't block on --wait; Certificates can take minutes to issue via ACME
+  # and Flux will reconcile drift regardless.
+  install:
+    disableWait: true
+    remediation:
+      retries: 3
+  upgrade:
+    disableWait: true
+    remediation:
+      retries: 3
   chart:
     spec:
       chart: drupal
